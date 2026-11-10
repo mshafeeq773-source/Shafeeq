@@ -519,7 +519,7 @@ html.js:not(.reduced) .story__media img { will-change: transform; }
 .duo__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 /* the artboard sets each paragraph a little above the middle of its photo */
 .duo .body { padding-bottom: calc(var(--lift, 0) * 2 * var(--u)); }
-.duo--a { --lift: 43.7; } .duo--b { --lift: 46; } .duo--c { --lift: 36.5; }
+.duo--a { --lift: 40.3; } .duo--b { --lift: 46; } .duo--c { --lift: 36.5; }
 .duo--left .body { margin-left: -3.5px; }
 /* widths in em so the lines break where the artboard breaks them at every desktop size */
 .duo--right .body { max-width: 19.62em; }
