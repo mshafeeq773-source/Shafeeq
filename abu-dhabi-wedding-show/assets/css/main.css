@@ -1,0 +1,543 @@
+/* =========================================================================
+   Abu Dhabi Wedding Show — responsive build
+   Master artboard: 1920 px wide. All fluid values are derived from it:
+   vw value = (px at 1920 / 1920) * 100, clamped to a readable minimum
+   and to the 1920 maximum so nothing grows past the approved design.
+
+   Motion: GSAP + ScrollTrigger + SplitText (text masks) and Lenis smooth
+   scroll, all in assets/js. Without JS, or with "reduce motion" on, the
+   site renders fully static: nothing here hides content by default.
+   ========================================================================= */
+
+@font-face { font-family: "Abu Dhabi Basis"; src: url("../fonts/AbuDhabiBasis-Light.woff2") format("woff2"); font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: "Abu Dhabi Basis"; src: url("../fonts/AbuDhabiBasis-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Abu Dhabi Basis"; src: url("../fonts/AbuDhabiBasis-Medium.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Abu Dhabi Basis"; src: url("../fonts/AbuDhabiBasis-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+
+:root {
+  /* Colour (sampled from the artboard) */
+  --purple: #36338c;
+  --pink: #f9cade;
+  --white: #ffffff;
+  --ink: #151537;
+  --placeholder: #636566;
+
+  /* Content column: 1510 px inside 205 px margins at 1920.
+     Expressed in % so it is relative to the section, not the scrollbar. */
+  --gutter: max(10.677%, calc((100% - 1510px) / 2));
+
+  /* --u = one artboard pixel. The artboard is a 1920x1080 screen, so the unit follows
+     whichever is tighter, width or height. A screen-sized section therefore always fits
+     one screen, on wide monitors and on short laptop windows alike. */
+  --u: min(100vw / 1920, 100svh / 1080);
+
+  /* Type scale (px at 1920x1080, minimum on small screens) */
+  --fs-nav: clamp(15px, calc(20 * var(--u)), 20px);
+  --fs-eyebrow: clamp(17px, calc(38 * var(--u)), 38px);      /* ABOUT / PARTNERS, Bold caps */
+  --fs-kicker: clamp(20px, calc(38.7 * var(--u)), 38.7px);   /* Connect / This is Abu Dhabi, Medium */
+  --fs-display: clamp(30px, calc(58 * var(--u)), 58px);      /* Pink headlines, Medium */
+  --fs-body: clamp(16px, calc(26 * var(--u)), 26px);         /* Body, Light */
+  --fs-title: clamp(26px, calc(48 * var(--u)), 48px);        /* Abu Dhabi Wedding Show 2025 */
+  --fs-edition: clamp(17px, calc(31 * var(--u)), 31px);      /* 2025 EDITION label on the 2025 page */
+  --fs-edition-list: clamp(17px, calc(27 * var(--u)), 27px); /* 2025 Edition links in the Past Editions card */
+  --fs-gallery: clamp(24px, calc(46.3 * var(--u)), 46.3px);  /* B2B Conference */
+  --fs-button: clamp(16px, calc(24 * var(--u)), 24px);      /* label: a step above body copy */
+  --fs-footer: clamp(15px, calc(22.1 * var(--u)), 22.1px);
+
+  --lh-body: 1.2;
+
+  /* Vertical rhythm */
+  --pad-section: clamp(56px, calc(146 * var(--u)), 146px);  /* section top padding (954 → 1100) */
+  --space-xl: clamp(56px, 8.5vw, 164px);
+  --space-l: clamp(40px, 5.25vw, 101px);
+  --space-m: clamp(24px, 3.1vw, 60px);
+
+  --photo-h: clamp(560px, 56.25vw, 1080px);      /* full-bleed photo sections, 1080 at 1920 */
+
+  /* Motion */
+  --ease-out: cubic-bezier(.16, 1, .3, 1);       /* expo-ish out */
+  --ease-inout: cubic-bezier(.65, 0, .35, 1);
+}
+
+@media (max-width: 1279px) { :root { --gutter: 7.5%; } }
+@media (max-width: 1023px) { :root { --gutter: 48px; --lh-body: 1.4; } }
+@media (max-width: 767px)  { :root { --gutter: 24px; --lh-body: 1.5; } }
+@media (max-width: 399px)  { :root { --gutter: 20px; } }
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition: none !important; animation: none !important; } }
+/* Lenis smooth scroll */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+body {
+  margin: 0;
+  font-family: "Abu Dhabi Basis", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 300;
+  color: var(--white);
+  background: var(--purple);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+img { display: block; max-width: 100%; height: auto; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+p { margin: 0; }
+h1, h2, h3 { margin: 0; font-weight: 500; }
+:focus-visible { outline: 2px solid var(--pink); outline-offset: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip-link { position: absolute; left: 16px; top: -60px; z-index: 100; padding: 10px 16px; background: var(--pink); color: var(--purple); font-weight: 500; }
+.skip-link:focus { top: 16px; }
+
+.wrap { padding-inline: var(--gutter); }
+
+/* ---------- Type roles ---------- */
+.eyebrow { font-size: var(--fs-eyebrow); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; line-height: 1; }
+.kicker { font-size: var(--fs-kicker); font-weight: 500; line-height: 1.15; }
+.display { font-size: var(--fs-display); font-weight: 500; line-height: 1.01; color: var(--pink); letter-spacing: -0.003em; }
+.body { font-size: var(--fs-body); line-height: var(--lh-body); font-weight: 300; }
+.body p + p { margin-top: calc(var(--lh-body) * 1em); }
+/* the designer's line break inside a headline (a span so it can be switched off on phones) */
+.br { display: block; }
+.kicker + .display { margin-top: 0.085em; }
+.eyebrow + .kicker, .eyebrow + .display { margin-top: clamp(20px, calc(40 * var(--u)), 40px); }
+.display + .body { margin-top: clamp(16px, calc(31 * var(--u)), 31px); }
+.balance { text-wrap: balance; }
+
+/* SplitText line masks. The mask must not change the layout, so the breathing room for descenders is
+   given by the clip itself (a negative inset) and not by padding: the leading stays exactly as designed.
+   The inner line travels 140% to be fully hidden. */
+.line-mask { overflow: visible !important; clip-path: inset(-.16em -.12em); }
+.line { will-change: transform; }
+
+/* ---------- Page curtain (enter / leave transition) ---------- */
+.curtain { position: fixed; inset: 0; z-index: 1000; pointer-events: none; display: none; }
+html.js .curtain { display: block; }
+html.js.curtain-timeout .curtain, html.js.reduced .curtain { display: none; }
+.curtain__panel { position: absolute; inset: -1px 0; }
+.curtain__panel--pink { background: var(--pink); }
+.curtain__panel--purple { background: var(--purple); }
+
+/* ---------- Custom cursor (mouse only, over the gallery) ----------
+   The native cursor is hidden only while the custom one is actually on screen (html.cursor-on),
+   so there is never a moment without a pointer. */
+.cursor { position: fixed; left: 0; top: 0; z-index: 900; width: 92px; height: 92px; margin: -46px 0 0 -46px; border-radius: 50%; background: var(--pink); color: var(--purple); display: none; align-items: center; justify-content: center; gap: 7px; font-size: 14px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; pointer-events: none; opacity: 0; visibility: hidden; transform: scale(.4); }
+.cursor::before, .cursor::after { content: ""; width: 6px; height: 6px; border: solid currentColor; border-width: 0 0 1.5px 1.5px; transform: rotate(45deg); }
+.cursor::after { transform: rotate(-135deg); }
+html.fine .cursor { display: flex; }
+html.cursor-on [data-cursor], html.cursor-on [data-cursor] * { cursor: none; }
+
+/* ---------- Header ---------- */
+.site-header {
+  position: fixed; inset: 0 0 auto 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  padding-top: clamp(20px, calc(91 * var(--u)), 91px); padding-bottom: 0;
+  transition: transform .6s var(--ease-inout), padding .6s var(--ease-inout);
+}
+/* backdrop lives on a pseudo-element so the header itself never becomes a
+   containing block for the fixed mobile menu */
+.site-header::before { content: ""; position: absolute; inset: 0; z-index: -1; background: rgba(54,51,140,.82); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); opacity: 0; transition: opacity .45s ease; }
+.site-header.is-scrolled { padding-top: clamp(12px, 1.1vw, 20px); padding-bottom: clamp(12px, 1.1vw, 20px); }
+.site-header.is-scrolled::before { opacity: 1; }
+.site-header.is-hidden { transform: translateY(-101%); }
+.menu-open .site-header { transform: none; }
+.menu-open .site-header::before { opacity: 0; }
+.logo { display: block; width: clamp(112px, calc(190 * var(--u)), 190px); color: var(--white); transition: width .6s var(--ease-inout); }
+.site-header.is-scrolled .logo { width: clamp(96px, 6.6vw, 126px); }
+.logo svg, .logo img { width: 100%; height: auto; display: block; }
+.nav ul { list-style: none; margin: 0; padding: 0; display: flex; align-items: center; gap: clamp(14px, 1.46vw, 28px); }
+.nav a, .nav button { font-size: var(--fs-nav); font-weight: 500; line-height: 1; white-space: nowrap; padding: 8px 0; display: inline-flex; align-items: center; gap: 4px; position: relative; }
+.nav a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 2px; height: 1px; background: var(--pink); transform: scaleX(0); transform-origin: right; transition: transform .45s var(--ease-inout); }
+.nav a:hover::after, .nav a[aria-current="page"]::after { transform: scaleX(1); transform-origin: left; }
+.nav .chev { width: 0.55em; height: 0.55em; margin-top: 0.1em; transition: transform .2s ease; }
+.has-sub { position: relative; }
+.has-sub.open .chev { transform: rotate(180deg); }
+.submenu a { display: block; }
+.submenu a::after { display: none; }
+/* Past Editions dropdown (desktop). Pink panel the width of the menu item; the item under the pointer, being
+   pressed, focused or of the current page turns blue with white Medium type. Sizes are the artboard's at 1920. */
+@media (min-width: 1024px) {
+  .submenu { position: absolute; top: calc(100% + 3px); left: 0; width: calc(100% + 2px); min-width: max-content; background: var(--pink);
+    opacity: 0; visibility: hidden; transform: translateY(6px); transition: opacity .25s ease, transform .35s var(--ease-out), visibility .25s; }
+  .submenu::before { content: ""; position: absolute; left: 0; right: 0; bottom: 100%; height: 12px; }   /* keeps it open while the pointer crosses the gap */
+  .has-sub:hover .submenu, .has-sub:focus-within .submenu, .has-sub.open .submenu { opacity: 1; visibility: visible; transform: none; }
+  .submenu a { position: relative; padding: .536em .714em; font-size: var(--fs-nav); font-weight: 300; letter-spacing: .01em; line-height: 1;
+    color: var(--purple); transition: background-color .2s ease, color .2s ease; }
+  .submenu a:first-child { padding-top: calc(.536em + 2px); }
+  .submenu a:last-child { padding-bottom: calc(.536em + 2px); }
+  .submenu a + a::before { content: ""; position: absolute; left: .714em; right: .714em; top: 0; height: 1px; background: rgba(255,255,255,.55); transition: opacity .2s ease; }
+  .submenu a:hover, .submenu a:focus-visible, .submenu a:active, .submenu a[aria-current="page"] { background: var(--purple); color: var(--white); font-weight: 500; letter-spacing: 0; }
+  /* one blue item at a time: the current page gives way while another item is under the pointer */
+  .submenu:hover a[aria-current="page"]:not(:hover) { background: none; color: var(--purple); font-weight: 300; letter-spacing: .01em; }
+  /* no rule against a blue item */
+  .submenu a:hover::before, .submenu a:hover + a::before, .submenu a:focus-visible::before, .submenu a:focus-visible + a::before,
+  .submenu:not(:hover) a[aria-current="page"]::before, .submenu:not(:hover) a[aria-current="page"] + a::before { opacity: 0; }
+}
+
+.menu-toggle { display: none; position: relative; z-index: 40; width: 44px; height: 44px; color: var(--white); }
+/* icon drawn 15% smaller (37.4 px) inside the 44 px button, so the tap target stays full size */
+.menu-toggle__icon { position: absolute; inset: 7.5%; width: 85%; height: 85%; transition: opacity .35s ease, transform .5s var(--ease-out); }
+.menu-toggle__icon--close { opacity: 0; transform: rotate(-90deg) scale(.6); }
+.menu-open .menu-toggle__icon--open { opacity: 0; transform: rotate(90deg) scale(.6); }
+.menu-open .menu-toggle__icon--close { opacity: 1; transform: none; }
+.menu-toggle:active { transform: scale(.94); }
+
+@media (max-width: 1023px) {
+  .menu-toggle { display: block; margin-right: -3.3px; }   /* keeps the smaller icon's right edge on the page margin */
+  .nav {
+    position: fixed; inset: 0; z-index: 30; background: var(--purple);
+    padding: 120px var(--gutter) 48px; overflow-y: auto;
+    opacity: 0; visibility: hidden; transition: opacity .35s ease, visibility .35s;
+  }
+  .menu-open .nav { opacity: 1; visibility: visible; }
+  .menu-open { overflow: hidden; }
+  .nav ul { flex-direction: column; align-items: flex-start; gap: 0; }
+  .nav li { width: 100%; border-bottom: 1px solid rgba(249,202,222,.3); transform: translateY(14px); opacity: 0; transition: transform .6s var(--ease-out), opacity .5s ease; }
+  .menu-open .nav li { transform: none; opacity: 1; }
+  .menu-open .nav li:nth-child(1) { transition-delay: .08s; }
+  .menu-open .nav li:nth-child(2) { transition-delay: .13s; }
+  .menu-open .nav li:nth-child(3) { transition-delay: .18s; }
+  .menu-open .nav li:nth-child(4) { transition-delay: .23s; }
+  .menu-open .nav li:nth-child(5) { transition-delay: .28s; }
+  .menu-open .nav li:nth-child(6) { transition-delay: .33s; }
+  .nav a, .nav button { font-size: clamp(22px, 4.2vw, 30px); padding: 18px 0; width: 100%; justify-content: space-between; }
+  .nav a::after, .nav .has-sub > button::after { display: none; }
+  .submenu { position: static; margin: 0 0 18px; padding: 6px; opacity: 1; visibility: visible; transform: none; display: none; background: var(--pink); }   /* 6px pink frame so a blue item reads against the blue overlay */
+  .has-sub.open .submenu { display: block; }
+  .has-sub:hover .submenu { display: none; }
+  .has-sub.open:hover .submenu { display: block; }
+  .submenu a { position: relative; font-size: clamp(18px, 3.2vw, 22px); font-weight: 300; padding: 14px 12px; color: var(--purple); }
+  .submenu a + a::before { content: ""; position: absolute; left: 12px; right: 12px; top: 0; height: 1px; background: rgba(255,255,255,.55); }
+  .submenu a:active, .submenu a:focus-visible, .submenu a[aria-current="page"] { background: var(--purple); color: var(--white); font-weight: 500; }
+  .submenu a:active::before, .submenu a:active + a::before, .submenu a[aria-current="page"]::before, .submenu a[aria-current="page"] + a::before { opacity: 0; }
+  .site-header .logo { position: relative; z-index: 40; }
+}
+
+/* ---------- Hero ---------- */
+.hero { position: relative; height: clamp(420px, 49.69vw, 954px); overflow: hidden; background: #0d0c26; isolation: isolate; }
+/* 120% tall so the parallax can travel without showing edges */
+.hero > img { position: absolute; left: 0; top: -10%; width: 100%; height: 120%; object-fit: cover; object-position: var(--hero-pos, 50% 67%); z-index: -2; }
+.hero::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(10,9,35,.55) 0%, rgba(10,9,35,0) 32%), rgba(10,9,35,.08); }
+/* a bright photo (white stage wall behind the menu): a deeper, longer shade at the top so the logo and menu read */
+.hero--bright::before { background: linear-gradient(180deg, rgba(10,9,35,.72) 0%, rgba(10,9,35,.5) 14%, rgba(10,9,35,.22) 30%, rgba(10,9,35,0) 46%), rgba(10,9,35,.1); }
+.play {
+  position: absolute; left: 50%; top: 56.4%; translate: -50% -50%;
+  width: clamp(72px, 10.73vw, 206px); aspect-ratio: 1; color: var(--white);
+}
+.play svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 2px 12px rgba(0,0,0,.25)); }
+html:not(.js) .play:hover, html.reduced .play:hover { scale: 1.05; }
+.scroll-hint { position: absolute; left: 50%; bottom: clamp(18px, 2.4vw, 46px); width: 1px; height: clamp(40px, 3.3vw, 64px); margin-left: -.5px; background: rgba(255,255,255,.28); overflow: hidden; z-index: 1; }
+.scroll-hint span { position: absolute; left: 0; top: 0; width: 100%; height: 45%; background: var(--pink); animation: hint 2s var(--ease-inout) infinite; }
+@keyframes hint { 0% { transform: translateY(-100%); } 65%, 100% { transform: translateY(230%); } }
+@media (max-width: 1023px) { .hero { height: clamp(480px, 72svh, 760px); } }
+@media (max-width: 767px)  { .display .br, .kicker .br { display: inline; }   /* phones: no forced break. inline, not none: the line animation misreads a hidden element */ .display { text-wrap: balance; } .tier__logos { min-height: 120px; } .hero { height: clamp(520px, 82svh, 760px); } .hero > img { object-position: var(--hero-pos-m, 42% 40%); } }
+
+/* Video dialog */
+.video-dialog { border: 0; padding: 0; background: #000; width: min(92vw, 1600px); aspect-ratio: 16/9; }
+.video-dialog::backdrop { background: rgba(8,7,30,.85); }
+.video-dialog video { width: 100%; height: 100%; display: block; }
+.video-dialog .close { position: absolute; top: 10px; right: 10px; width: 44px; height: 44px; font-size: 28px; line-height: 44px; color: #fff; z-index: 2; }
+
+/* ---------- About (split) ---------- */
+.about { display: grid; grid-template-columns: 57.8125% 1fr; min-height: min(var(--photo-h), 100svh); }
+.about__text { background: var(--purple); display: flex; flex-direction: column; justify-content: center;
+  padding: max(var(--pad-section), calc(110 * var(--u) + 40px)) clamp(40px, 8.1vw, 155px) calc(80 * var(--u)) var(--gutter);
+  padding-left: max(10.677vw, calc((100vw - 1510px) / 2)); }
+.about__text .body { max-width: calc(750 * var(--u) + 40px); }
+.about__media { position: relative; overflow: hidden; }
+/* The photo file is already cut to the artboard mask (810 x 1080 frame at 1920), so it fills the frame edge to edge with no parallax spare */
+.about__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
+@media (max-width: 1279px) { .about__text { padding-left: 7.5vw; } }
+@media (max-width: 1023px) {
+  .about { grid-template-columns: 1fr; min-height: 0; }
+  .about__text { display: block; padding: var(--pad-section) var(--gutter); }
+  .about__text .body { max-width: 640px; }
+  .about__media { aspect-ratio: 4 / 3; }
+  .about__media img { object-position: 50% 69%; }   /* wider frame: keep the dome and the couple, lose sky first */
+}
+@media (max-width: 767px) {
+  /* phones: eyebrow, kicker, headline, then the photo, then the copy. The text wrapper is dissolved
+     (display: contents) so the photo can sit between its children. */
+  .about { display: flex; flex-direction: column; padding-top: var(--pad-section); padding-bottom: var(--pad-section); }
+  .about__text { display: contents; }
+  .about__text > * { margin-inline: var(--gutter); }
+  .about__text > .eyebrow { order: 1; }
+  .about__text > .kicker { order: 2; }
+  .about__text > .display { order: 3; }
+  .about__media { order: 4; aspect-ratio: 4 / 5; margin-top: 30px; }
+  .about__text > .body { order: 5; margin-top: 30px; max-width: none; }
+}
+
+/* =========================================================================
+   Story: Connect / Discover / Experience
+   One full-screen stage that pins while you scroll. The images dissolve
+   into each other (scroll-driven), the text swaps with masked line moves.
+   Without JS (or with reduced motion) the three panels simply stack.
+   ========================================================================= */
+.story { position: relative; background: var(--purple); color: var(--white); }
+.story__stage { position: relative; isolation: isolate; }
+.story__panel { position: relative; height: var(--photo-h); overflow: hidden; }
+.story__media { position: absolute; inset: 0; z-index: 1; overflow: hidden; }
+.story__zoom { position: absolute; inset: 0; }
+.story__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: var(--pos-m, 50% 50%); }
+/* legibility veil: on the stage when pinned, per panel when stacked. Kept light: the photos are already graded dark. */
+.story__stage::before, .story__panel::before { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background:
+    /* eased stops (many small steps) so the shadow has no visible edge */
+    radial-gradient(ellipse 85% 75% at 12% 8%, rgba(0,0,0,.22) 0%, rgba(0,0,0,.19) 14%, rgba(0,0,0,.14) 30%, rgba(0,0,0,.09) 46%, rgba(0,0,0,.045) 62%, rgba(0,0,0,.018) 78%, rgba(0,0,0,0) 100%),
+    linear-gradient(180deg, rgba(0,0,0,.08) 0%, rgba(0,0,0,0) 35%); }
+/* paragraph shadow: a very large, very soft cloud that travels (and fades) with the text */
+.story__body::before { content: ""; position: absolute; inset: -110% -70% -110% -60%; z-index: -1; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(0,0,0,.24) 0%, rgba(0,0,0,.21) 16%, rgba(0,0,0,.165) 32%, rgba(0,0,0,.11) 48%, rgba(0,0,0,.055) 64%, rgba(0,0,0,.02) 80%, rgba(0,0,0,0) 100%); }
+.story__head .kicker, .story__head .display, .story__body { text-shadow: 0 1px 24px rgba(0,0,0,.3); }
+.story__stage::before { display: none; }
+.story__veil { position: absolute; inset: 0; z-index: 2; background: var(--purple); opacity: 0; pointer-events: none; display: none; }
+html.js:not(.reduced) .story__veil { display: block; }
+.story__head { position: absolute; z-index: 3; top: calc(var(--pad-section) - 36 * var(--u)); left: var(--gutter); right: var(--gutter); }
+.story__body {
+  position: absolute; z-index: 3; top: var(--body-top, 38.8%);
+  left: calc(var(--gutter) + (100% - 2 * var(--gutter)) * 0.6874);
+  width: calc((100% - 2 * var(--gutter)) * 0.3365);
+}
+/* The artboard's own shading for photos supplied clean. Two layers on the photo itself, so they dissolve with it
+   and are not enlarged with it: ::after from the top, ::before from the right (where the paragraph sits).
+   --shade and --shade-r on each panel set their strength. */
+.story__media::before, .story__media::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.story__media::after { opacity: var(--shade, 0); }
+.story__media::before { opacity: var(--shade-r, 0); }
+/* Desktop: the artboard's own crop of each image (scale about the anchor point) */
+@media (min-width: 1024px) {
+  .story__zoom { transform: scale(var(--zoom, 1)); transform-origin: var(--origin, 50% 50%); }
+  .story__media img { object-position: var(--origin, 50% 50%); }
+  /* strengths are the artboard's, measured, less what the shared veil above already adds */
+  .story__media::after { background:
+      linear-gradient(180deg, rgba(0,0,0,.52) 0%, rgba(0,0,0,.404) 10%, rgba(0,0,0,.289) 20%, rgba(0,0,0,.173) 30%, rgba(0,0,0,.058) 40%, rgba(0,0,0,0) 45%),
+      linear-gradient(rgba(0,0,0,.04), rgba(0,0,0,.04)); }
+  .story__media::before { background: linear-gradient(270deg, #000 0%, rgba(0,0,0,.86) 10%, rgba(0,0,0,.70) 20%, rgba(0,0,0,.53) 30%, rgba(0,0,0,.34) 40%, rgba(0,0,0,.14) 50%, rgba(0,0,0,0) 56%); }
+}
+@media (max-width: 1279px) {
+  .story__body { left: calc(var(--gutter) + (100% - 2 * var(--gutter)) * 0.62); width: calc((100% - 2 * var(--gutter)) * 0.38); }
+}
+@media (max-width: 1023px) {
+  .story__panel { height: auto; min-height: clamp(600px, 118vw, 920px); }
+  .story__head { top: var(--pad-section); }
+  .story__head .kicker { padding-right: 130px; }
+  .story__body { top: auto; bottom: var(--pad-section); left: var(--gutter); right: var(--gutter); width: auto; max-width: 560px; }
+  .story__stage::before, .story__panel::before { background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.15) 34%, rgba(0,0,0,0) 50%, rgba(0,0,0,.7) 100%); }
+  .story__body::before { inset: -70% -30%; }
+  /* the three story headlines keep the artboard's own line break on phones too (they fit at 360), so the
+     animated and the static version break in the same place */
+  .story__head .display .br { display: block; }
+  /* phones and tablets: the artboard's 9:16 crop, and more shade under the paragraph, which sits at the bottom here */
+  .story__zoom { transform: scale(var(--zoom-m, 1)); transform-origin: var(--pos-m, 50% 50%); }
+  .story__media::after { background: linear-gradient(180deg, rgba(0,0,0,.18) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,.2) 62%, rgba(0,0,0,.55) 100%); }
+  .story__media::before { display: none; }
+}
+/* pagination: 01 ——— 03 */
+.story__index { position: absolute; z-index: 3; top: calc(var(--pad-section) - 36 * var(--u) + .3em); right: var(--gutter); display: none; align-items: center; gap: clamp(10px, .8vw, 16px); font-size: var(--fs-body); font-weight: 300; line-height: 1.2; color: var(--white); }
+.story__num { display: inline-block; height: 1.2em; overflow: hidden; }
+.story__num-inner { display: block; }
+.story__track { position: relative; width: clamp(48px, 5vw, 96px); height: 1px; background: rgba(255,255,255,.32); }
+.story__track i { position: absolute; inset: 0; background: var(--pink); transform: scaleX(0); transform-origin: left; }
+.story__total { opacity: .55; }
+@media (max-width: 1023px) { .story__index { top: var(--pad-section); } }
+
+/* pinned mode (JS on, motion allowed) */
+html.js:not(.reduced) .story { height: calc(var(--story-n, 3) * 100svh); }
+html.js:not(.reduced) .story__stage { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+html.js:not(.reduced) .story__stage::before { display: block; }
+html.js:not(.reduced) .story__panel { position: absolute; inset: 0; height: 100%; min-height: 0; overflow: visible; }
+html.js:not(.reduced) .story__panel::before { display: none; }
+html.js:not(.reduced) .story__index { display: flex; }
+html.js:not(.reduced) .story__media img { will-change: transform; }
+
+/* ---------- Partners ---------- */
+.partners { padding-top: var(--pad-section); }
+.partners .body { max-width: 720px; }
+.tier { margin-top: clamp(40px, 3.7vw, 71px); }
+.tier + .tier { margin-top: clamp(44px, 5.2vw, 100px); }
+/* thin pink rules are pseudo-elements so they can be drawn in on scroll */
+.rule { position: relative; }
+.rule::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--pink); transform: scaleX(var(--line, 1)); transform-origin: left; }
+.tier__label { font-size: var(--fs-body); color: var(--pink); font-weight: 300; line-height: 1; padding-bottom: clamp(7px, .57vw, 11px); }
+.tier__logos { min-height: clamp(150px, 22.86vw, 439px); display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); align-items: center; gap: 24px; padding-block: 24px; }
+/* filled tiers (2025 page): logos sit on one baseline grid, optically sized by area (--w is px at 1920) */
+.tier__logos--set { min-height: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start;
+  gap: clamp(28px, 3.4vw, 64px) clamp(36px, 4.7vw, 90px); padding: clamp(32px, 3.3vw, 64px) 0 0; list-style: none; margin: 0; }
+.tier__logos--set li { display: flex; align-items: center; }
+.tier__logos--set img { width: calc(var(--w) * max(var(--u), .6px)); height: auto; max-height: clamp(48px, 6.4vw, 124px); object-fit: contain; }
+.partners--2025 { padding-top: var(--pad-section); }
+@media (max-width: 767px) { .tier__logos--set { gap: 28px 36px; } }
+
+/* ---------- Past editions (home) ----------
+   Pink card with the edition list, photo on the right. Artboard: 1510 x 866, pink 859.5 wide, photo 650.5 wide. */
+.past { padding-top: clamp(48px, 4.4vw, 85px); padding-bottom: clamp(0px, 1.67vw, 32px); }
+.past__card { position: relative; isolation: isolate; display: grid; grid-template-columns: 56.92% 1fr; color: var(--purple); }
+.past__text { position: relative; display: flex; flex-direction: column; justify-content: center;
+  padding: 40px clamp(24px, calc(48 * var(--u)), 48px) calc(40px + 12.7 * var(--u)) clamp(28px, calc(76 * var(--u)), 76px); }
+/* the pink panel is a layer of its own so it can wipe in */
+.past__text::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--pink); transform: scaleX(var(--wipe, 1)); transform-origin: left; }
+.past__text .display { color: inherit; letter-spacing: .0015em; margin-top: clamp(20px, calc(44 * var(--u)), 44px); }
+.past__text .body { max-width: clamp(280px, calc(634 * var(--u)), 634px); margin-top: clamp(14px, calc(24.3 * var(--u)), 24.3px); }
+/* the card is 1510 x 718 at 1920 (the photo sets the height) */
+.past__media { position: relative; aspect-ratio: 650.5 / 718; overflow: hidden; }
+/* 116% tall: room for the scroll drift. The file carries 8% spare top and bottom, so mid-drift is the exact artboard crop. */
+.past__media img { position: absolute; left: 0; top: -8%; width: 100%; height: 116%; object-fit: cover; }
+
+.editions { list-style: none; margin: clamp(28px, calc(52.5 * var(--u)), 52.5px) 0 0; padding: 0; width: clamp(140px, calc(189 * var(--u)), 189px);
+  font-size: var(--fs-edition-list); font-weight: 300; line-height: 1; letter-spacing: .02em; }
+.editions li { position: relative; }
+.editions li + li { margin-top: clamp(11px, calc(15 * var(--u)), 15px); }
+.editions li:not(:last-child) { padding-bottom: clamp(11px, calc(15 * var(--u)), 15px); }
+.editions li:not(:last-child)::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--white); transform: scaleX(var(--line, 1)); transform-origin: left; }
+.editions a { display: flex; align-items: center; justify-content: space-between; }
+.editions a span { transition: transform .5s var(--ease-out); }
+.editions a svg { width: .3em; height: .5em; flex: none; opacity: 0; transform: translateX(-.5em); transition: opacity .3s ease, transform .5s var(--ease-out); }
+.editions a:hover span, .editions a:focus-visible span { transform: translateX(.18em); }
+.editions a:hover svg, .editions a:focus-visible svg { opacity: 1; transform: none; }
+
+/* kept for future use (pill button) */
+.btn {
+  display: inline-flex; align-items: center; gap: .75em;
+  margin-top: clamp(28px, calc(56 * var(--u)), 56px);
+  padding: 0 1.35em 0 1.45em; height: 2.6em; min-height: 46px;
+  border-radius: 999px; background: var(--pink); color: var(--purple);
+  font-size: var(--fs-button); font-weight: 500; line-height: 1;
+  transition: background .3s ease, color .3s ease;
+}
+.btn svg { width: .42em; height: .62em; transition: transform .45s var(--ease-out); }
+.btn:hover { background: #fff; }
+.btn:hover svg { transform: translateX(.2em); }
+@media (max-width: 1023px) {
+  .past__card { grid-template-columns: 1fr; }
+  .past__media { order: -1; }                        /* stacked: the photo first, then the pink panel */
+  .past__text { padding: 48px clamp(24px, 6vw, 48px) 52px; }
+  .past__text .body { max-width: 560px; }
+  .past__media { aspect-ratio: 4 / 3; }
+  .past__media img { object-position: 50% 12%; }     /* keep the show logo on the screen in frame */
+}
+@media (max-width: 767px) { .past__media { aspect-ratio: 650.5 / 718; } .past__media img { object-position: 50% 50%; } }   /* phones: the artboard's own crop, so the show logo is never cut */
+
+/* ---------- Gallery (home, before the footer) ----------
+   Five 4:5 photos across the content column, the middle one always largest.
+   Artboard widths: 368.5 / 276.5 / 253.5 px with 20.5 px gaps = the 1510 px column.
+   JS places and scales the slides (see carousel() in main.js); without JS this is the same row, static. */
+/* PHOTO GALLERY: same style as the PARTNERS eyebrow; the old 160 px gap above the gallery is split around it */
+.gallery-eyebrow { margin-top: clamp(56px, 6.25vw, 120px); color: var(--white); }
+.carousel { position: relative; margin-top: clamp(24px, 2.6vw, 50px); }
+.carousel__track { display: flex; align-items: center; gap: 1.33%; outline: none; user-select: none; -webkit-user-select: none; }
+.carousel__slide { position: relative; flex: 0 0 auto; margin: 0; width: 18.311%; aspect-ratio: 4 / 5; overflow: hidden; background: #2e2b7a; }
+.carousel__slide:nth-child(3) { width: 24.404%; }
+.carousel__slide:nth-child(1), .carousel__slide:nth-child(5) { width: 16.788%; }
+/* the photo is 7% wider than its frame: 3.5% spare each side lets it trail slightly while the row moves */
+.carousel__img { position: absolute; top: 0; left: -3.5%; width: 107%; height: 100%; will-change: transform; }
+.carousel__img img { width: 100%; height: 100%; object-fit: cover; -webkit-user-drag: none; pointer-events: none; }
+@media (max-width: 1023px) {
+  html:not(.js) .carousel__track { overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; gap: 12px; margin-inline: calc(50% - 50vw); padding-inline: var(--gutter); }
+  html:not(.js) .carousel__slide:nth-child(n) { width: 62vw; scroll-snap-align: center; }
+}
+/* live mode: full-bleed stage so photos can fade in and out in the page margins */
+.carousel.is-flow .carousel__track { display: block; position: relative; gap: 0; margin-inline: calc(50% - 50vw); height: calc(var(--cw, 24vw) * 1.25); overflow: hidden; overflow: clip; touch-action: pan-y; cursor: grab; }
+.carousel.is-flow .carousel__slide:nth-child(n) { position: absolute; left: 0; top: 0; width: var(--cw, 24vw); transform-origin: 50% 50%; will-change: transform, opacity; }
+.carousel.is-flow.is-grabbing .carousel__track { cursor: grabbing; }
+.carousel__track:focus-visible .carousel__slide.is-active { outline: 2px solid var(--pink); outline-offset: -2px; }
+
+/* ---------- Footer ---------- */
+.site-footer { position: relative; margin-top: clamp(56px, 4.7vw, 90px); padding-block: clamp(48px, 5vw, 96px) clamp(48px, 4.65vw, 89px); font-size: var(--fs-footer); }
+.site-footer::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--pink); transform: scaleX(var(--line, 1)); transform-origin: left; }
+.footer__grid { display: grid; grid-template-columns: 20.53% 33.58% 23.38% 1fr; align-items: start; }
+.footer__logo { width: clamp(130px, 11.83vw, 227px); }
+.footer__logo--exp { width: clamp(124px, 10.85vw, 208px); margin-top: 0.3em; }
+.footer__logo svg { width: 100%; height: auto; display: block; }
+.site-footer dl { margin: 0; }
+.site-footer dt { color: var(--pink); font-weight: 700; line-height: 1.2; }
+.site-footer dd { margin: 0 0 1.185em; font-weight: 400; line-height: 1.2; }
+.site-footer dd:last-child { margin-bottom: 0; }
+.site-footer h2 { font-size: inherit; font-weight: 700; color: var(--pink); line-height: 1.2; margin-bottom: .27em; }
+.site-footer ul { list-style: none; margin: 0; padding: 0; }
+.site-footer li a { display: inline-block; font-weight: 400; line-height: 1.2; padding: .26em 0; transition: color .25s ease; }
+.site-footer li a:hover, .site-footer dd a:hover { color: var(--pink); }
+.social { display: flex; gap: 2px; margin-top: .65em; }
+.social a { width: clamp(30px, 1.6vw, 31px); height: clamp(30px, 1.6vw, 31px); display: block; color: var(--white); transition: opacity .25s ease, translate .35s var(--ease-out); }
+.social a:hover { opacity: .75; translate: 0 -2px; }
+.social svg { width: 100%; height: 100%; display: block; }
+@media (max-width: 1023px) {
+  .footer__grid { grid-template-columns: 1fr 1fr; row-gap: 48px; column-gap: 32px; }
+  .footer__brand { grid-column: 1 / -1; display: flex; align-items: center; gap: clamp(32px, 6vw, 64px); }
+  .footer__brand .footer__logo--exp { margin-top: 0; }
+}
+@media (max-width: 479px) {
+  .footer__grid { grid-template-columns: 1fr; row-gap: 40px; }
+  .social a { width: 36px; height: 36px; }
+  .social { gap: 6px; }
+}
+.footer__brand { display: contents; }
+@media (max-width: 1023px) { .footer__brand { display: flex; } }
+
+/* =========================================================================
+   2025 Edition page
+   ========================================================================= */
+.edition { padding-top: clamp(64px, 7.9vw, 151px); }
+/* text column (intro + fresh) is centred on the height of the photo: the two 1fr rows take up the slack */
+.edition__top { display: grid; grid-template-columns: 1fr 42.19%; grid-template-rows: 1fr auto auto 1fr; grid-template-areas: ". media" "intro media" "fresh media" ". media"; column-gap: var(--space-m); }
+.edition__intro { grid-area: intro; }
+.edition__fresh { grid-area: fresh; margin-top: clamp(36px, calc(60 * var(--u)), 60px); }
+.edition__fresh .kicker + .display { margin-top: -.036em; }
+.edition__fresh .display + .body { margin-top: clamp(14px, calc(19.3 * var(--u)), 19.3px); }
+.edition__fresh .body { max-width: 30em; }
+.edition__media { grid-area: media; position: relative; aspect-ratio: 637 / 664; overflow: hidden; align-self: start; }
+.edition__media picture { position: absolute; inset: 0; display: block; }
+/* the photo files on this page are cut to the artboard crops, so they fill their frames exactly (no scroll drift) */
+.edition__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.edition-label { font-size: var(--fs-edition); line-height: 1.1; letter-spacing: 0.01em; }
+.edition-label b { font-weight: 700; }
+.edition-title { font-size: var(--fs-title); color: var(--pink); font-weight: 500; line-height: 1.1; margin-top: .0125em; }
+.meta { list-style: none; margin: clamp(14px, calc(25.3 * var(--u)), 25.3px) 0 0; padding: 0; font-size: var(--fs-body); line-height: 1.2; }
+.meta li { display: flex; align-items: center; gap: .55em; }
+.meta li + li { margin-top: .46em; }
+.meta svg { width: 1.15em; height: 1.15em; flex: none; color: var(--pink); }
+.kicker--white + .display { margin-top: .1em; }
+
+.duo { display: grid; align-items: center; column-gap: clamp(32px, 4.375vw, 84px); }
+.duo--left { grid-template-columns: 57.88% 1fr; margin-top: clamp(48px, 4.5vw, 87px); }
+.duo--right { grid-template-columns: 1fr 57.88%; margin-top: clamp(48px, 4.75vw, 91px); }
+.duo--c { margin-top: clamp(48px, 6.4vw, 123px); }
+.duo--left .duo__media { aspect-ratio: 874 / 583; margin-left: -3px; }
+.duo--right .duo__media { aspect-ratio: 874 / 544; }
+.duo--c .duo__media { aspect-ratio: 877 / 544; }
+.duo__media { position: relative; overflow: hidden; }
+.duo__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* the artboard sets each paragraph a little above the middle of its photo */
+.duo .body { padding-bottom: calc(var(--lift, 0) * 2 * var(--u)); }
+.duo--a { --lift: 61; } .duo--b { --lift: 46; } .duo--c { --lift: 36.5; }
+.duo--left .body { margin-left: -3.5px; }
+/* widths in em so the lines break where the artboard breaks them at every desktop size */
+.duo--right .body { max-width: 19.62em; }
+.duo--left .body { max-width: 21.2em; }
+
+.gallery { margin-top: clamp(56px, 8.85vw, 170px); }
+.gallery + .gallery { margin-top: clamp(48px, 4.43vw, 85px); }
+.gallery__title { font-size: var(--fs-gallery); font-weight: 300; color: var(--pink); line-height: 1.1; padding-bottom: clamp(5px, .52vw, 10px); }
+.gallery__grid { list-style: none; margin: clamp(14px, 1.3vw, 25px) 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(10px, 1.1vw, 21px); }
+.gallery__grid li { aspect-ratio: 489 / 368; overflow: hidden; background: var(--placeholder); }
+.gallery__grid img { width: 100%; height: 100%; object-fit: cover; transition: transform .9s var(--ease-out); }
+.gallery__grid li:hover img { transform: scale(1.04); }
+
+@media (max-width: 1023px) {
+  .edition__top { grid-template-columns: 1fr; grid-template-rows: none; grid-template-areas: "intro" "media" "fresh"; }
+  .edition__media { margin-top: 40px; aspect-ratio: 4 / 3; }
+  .edition__fresh { margin-top: 48px; }
+  .duo--left, .duo--right { grid-template-columns: 1fr; row-gap: 32px; }
+  .duo--left .duo__media { margin-left: 0; }
+  .duo--right .duo__media { order: -1; }
+  .duo .body { max-width: 640px; padding-bottom: 0; margin-left: 0; }
+}
+@media (max-width: 767px) {
+  .gallery__grid { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 82%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-right: calc(-1 * var(--gutter)); padding-right: var(--gutter); }
+  .gallery__grid::-webkit-scrollbar { display: none; }
+  .gallery__grid li { scroll-snap-align: start; }
+}
