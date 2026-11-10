@@ -446,37 +446,41 @@ html.js:not(.reduced) .story__media img { will-change: transform; }
 .carousel.is-flow.is-grabbing .carousel__track { cursor: grabbing; }
 .carousel__track:focus-visible .carousel__slide.is-active { outline: 2px solid var(--pink); outline-offset: -2px; }
 
-/* ---------- Footer ---------- */
-.site-footer { position: relative; margin-top: clamp(56px, 4.7vw, 90px); padding-block: clamp(48px, 5vw, 96px) clamp(48px, 4.65vw, 89px); font-size: var(--fs-footer); }
+/* ---------- Footer ----------
+   At 1920: show logo at 205, details at 670, quick links at 1022, Experience Abu Dhabi logo with the
+   social icons under it against the right edge of the column (1507 to 1715). */
+.site-footer { position: relative; margin-top: clamp(56px, 4.7vw, 90px); padding-block: clamp(40px, 2.97vw, 57px) clamp(40px, 3.23vw, 62px); font-size: var(--fs-footer); }
 .site-footer::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--pink); transform: scaleX(var(--line, 1)); transform-origin: left; }
-.footer__grid { display: grid; grid-template-columns: 20.53% 33.58% 23.38% 1fr; align-items: start; }
-.footer__logo { width: clamp(130px, 11.83vw, 227px); }
-.footer__logo--exp { width: clamp(124px, 10.85vw, 208px); margin-top: 0.3em; }
-.footer__logo svg { width: 100%; height: auto; display: block; }
+.footer__grid { display: grid; grid-template-columns: 30.79% 23.34% 1fr auto; align-items: start; }
+.footer__logo { display: block; width: clamp(130px, 11.83vw, 227px); margin-top: .12em; }
+.footer__logo--exp { width: clamp(124px, 10.85vw, 208px); }
+.footer__logo img { width: 100%; height: auto; display: block; }
 .site-footer dl { margin: 0; }
 .site-footer dt { color: var(--pink); font-weight: 700; line-height: 1.2; }
-.site-footer dd { margin: 0 0 1.185em; font-weight: 400; line-height: 1.2; }
+.site-footer dd { margin: 0 0 1.2em; font-weight: 400; line-height: 1.2; }
 .site-footer dd:last-child { margin-bottom: 0; }
 .site-footer h2 { font-size: inherit; font-weight: 700; color: var(--pink); line-height: 1.2; margin-bottom: .27em; }
 .site-footer ul { list-style: none; margin: 0; padding: 0; }
 .site-footer li a { display: inline-block; font-weight: 400; line-height: 1.2; padding: .26em 0; transition: color .25s ease; }
 .site-footer li a:hover, .site-footer dd a:hover { color: var(--pink); }
-.social { display: flex; gap: 2px; margin-top: .65em; }
+.social { display: flex; gap: clamp(2px, .18vw, 3.4px); margin-top: clamp(24px, 2.19vw, 42px); }
 .social a { width: clamp(30px, 1.6vw, 31px); height: clamp(30px, 1.6vw, 31px); display: block; color: var(--white); transition: opacity .25s ease, translate .35s var(--ease-out); }
 .social a:hover { opacity: .75; translate: 0 -2px; }
-.social svg { width: 100%; height: 100%; display: block; }
+.social img { width: 100%; height: 100%; display: block; }
 @media (max-width: 1023px) {
+  /* tablet: the two logos on the first row, details and links on the second */
   .footer__grid { grid-template-columns: 1fr 1fr; row-gap: 48px; column-gap: 32px; }
-  .footer__brand { grid-column: 1 / -1; display: flex; align-items: center; gap: clamp(32px, 6vw, 64px); }
-  .footer__brand .footer__logo--exp { margin-top: 0; }
+  .footer__logo { margin-top: 0; }
+  .footer__exp { order: -1; }
+  .footer__grid > .footer__logo { order: -2; }
 }
 @media (max-width: 479px) {
+  /* phone: one column in reading order, the Experience Abu Dhabi logo and icons last */
   .footer__grid { grid-template-columns: 1fr; row-gap: 40px; }
+  .footer__exp, .footer__grid > .footer__logo { order: 0; }
   .social a { width: 36px; height: 36px; }
-  .social { gap: 6px; }
+  .social { gap: 6px; margin-top: 22px; }
 }
-.footer__brand { display: contents; }
-@media (max-width: 1023px) { .footer__brand { display: flex; } }
 
 /* =========================================================================
    2025 Edition page

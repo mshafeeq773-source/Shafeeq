@@ -165,7 +165,7 @@
     });
 
     /* supporting copy: soft rise */
-    document.querySelectorAll('.eyebrow, .body > p, .btn, .meta, .edition-label, .tier__label, .footer__brand > a, .footer__info, .footer__links').forEach(function (el) {
+    document.querySelectorAll('.eyebrow, .body > p, .btn, .meta, .edition-label, .tier__label, .footer__grid > *').forEach(function (el) {
       if (inStory(el)) return;
       gsap.from(el, { y: 28, autoAlpha: 0, duration: 1.1, ease: 'power3.out', scrollTrigger: once(el, 'top 92%') });
     });
