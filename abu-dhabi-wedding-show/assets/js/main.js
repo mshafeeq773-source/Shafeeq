@@ -136,8 +136,8 @@
     tl.fromTo(hero.querySelector('img'), { scale: 1.16 }, { scale: 1, duration: 2.4, ease: 'expo.out' }, 0)
       .from('.site-header .logo', { y: -14, autoAlpha: 0, duration: 1, ease: 'power3.out', clearProps: 'all' }, 0.15)
       .from(navItems, { y: -10, autoAlpha: 0, duration: 0.9, stagger: 0.05, ease: 'power3.out', clearProps: 'all' }, 0.25)
-      .from('.play', { scale: 0.5, autoAlpha: 0, duration: 1.3, ease: 'expo.out' }, 0.3)
       .from('.scroll-hint', { autoAlpha: 0, duration: 1 }, 1.1);
+    if (hero.querySelector('.play')) tl.from('.play', { scale: 0.5, autoAlpha: 0, duration: 1.3, ease: 'expo.out' }, 0.3);
     return tl;
   }
   function heroParallax() {
