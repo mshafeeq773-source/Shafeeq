@@ -165,7 +165,7 @@
     });
 
     /* supporting copy: soft rise */
-    document.querySelectorAll('.eyebrow, .body > p, .btn, .meta, .edition-label, .tier__label, .footer__grid > *').forEach(function (el) {
+    document.querySelectorAll('.eyebrow, .body > p, .btn, .meta, .edition-label, .tier__label, .policy h2, .policy li, .footer__grid > *').forEach(function (el) {
       if (inStory(el)) return;
       gsap.from(el, { y: 28, autoAlpha: 0, duration: 1.1, ease: 'power3.out', scrollTrigger: once(el, 'top 92%') });
     });
@@ -204,6 +204,11 @@
     /* past editions card: the pink panel wipes in, the edition list follows line by line */
     document.querySelectorAll('.past__text').forEach(function (el) {
       gsap.fromTo(el, { '--wipe': 0 }, { '--wipe': 1, duration: 1.5, ease: 'expo.inOut', scrollTrigger: once(el, 'top 85%') });
+    });
+    /* registration form: the fields rise one after another. The inline styles are cleared afterwards so
+       nothing is left that could sit over the country list. */
+    document.querySelectorAll('.reg__form').forEach(function (f) {
+      gsap.from(f.children, { y: 26, autoAlpha: 0, duration: 1, ease: 'power3.out', stagger: 0.07, delay: 0.2, clearProps: 'all', scrollTrigger: once(f, 'top 92%') });
     });
     document.querySelectorAll('.editions').forEach(function (ul) {
       var items = gsap.utils.toArray('li', ul);

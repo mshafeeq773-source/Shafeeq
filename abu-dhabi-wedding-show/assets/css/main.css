@@ -548,3 +548,136 @@ html.js:not(.reduced) .story__media img { will-change: transform; }
   .gallery__grid::-webkit-scrollbar { display: none; }
   .gallery__grid li { scroll-snap-align: start; }
 }
+
+/* =========================================================================
+   Registration page
+   A plain page: the title, one paragraph, then the form straight on the purple background, in one centred
+   column that is narrower than the rest of the site (940 px at 1920) so the fields keep a sensible length.
+   Eight fields, two to a row (one to a row on phones); the button spans the column. Sizes are px at 1920.
+   Behaviour (validation, country search, phone formatting, thank-you message) is in assets/js/register.js;
+   without JS the form still works with the browser's own validation and a plain country list.
+   ========================================================================= */
+.reg {
+  --fs-field: clamp(16px, calc(22 * var(--u)), 22px);    /* typed text: never under 16 px, so iOS does not zoom */
+  --fs-label: clamp(15px, calc(22 * var(--u)), 22px);
+  --fs-hint: clamp(14px, calc(18 * var(--u)), 18px);
+  --field-h: clamp(52px, calc(64 * var(--u)), 64px);
+  --field-pad: clamp(14px, calc(18 * var(--u)), 18px);
+  --col-gap: clamp(20px, calc(40 * var(--u)), 40px);
+  --error: #ffb3a7;                                      /* 6.1:1 on the purple */
+  /* no hero on this page: clear the fixed header (its top padding + the logo) and add the section space */
+  padding-top: calc(clamp(20px, calc(91 * var(--u)), 91px) + clamp(47px, calc(79 * var(--u)), 79px) + clamp(36px, calc(96 * var(--u)), 96px));
+}
+.reg [hidden] { display: none !important; }
+.reg__inner { max-width: clamp(600px, calc(940 * var(--u)), 940px); margin-inline: auto; }
+.reg .body a { color: var(--pink); text-decoration: underline; text-underline-offset: .2em; text-decoration-thickness: 1px; transition: color .25s ease; }
+.reg .body a:hover { color: var(--white); }
+
+.reg__form { margin-top: clamp(32px, calc(56 * var(--u)), 56px); }
+.form__grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--col-gap); align-items: start; }
+.form__grid > .field:nth-child(-n+2) { margin-top: 0; }   /* the first row sits right under the intro (or the error line) */
+
+.field { margin: clamp(20px, calc(30 * var(--u)), 30px) 0 0; padding: 0; border: 0; min-width: 0; }
+.field--wide { grid-column: 1 / -1; }
+.field__label { display: block; padding: 0; font-size: var(--fs-label); font-weight: 400; line-height: 1.25; }
+.field__opt { font-weight: 300; }
+.field__control { margin-top: clamp(8px, calc(12 * var(--u)), 12px); }
+.field__input { display: block; width: 100%; height: var(--field-h); margin: 0; padding: 0 var(--field-pad);
+  font: inherit; font-size: var(--fs-field); font-weight: 400; line-height: 1.2; color: var(--white); caret-color: var(--pink);
+  background: transparent; border: 1px solid var(--white); border-radius: 0; -webkit-appearance: none; appearance: none;
+  transition: box-shadow .2s ease, border-color .2s ease; }
+.field__input::placeholder { color: var(--white); opacity: .6; }
+.field__input:hover { box-shadow: inset 0 0 0 1px var(--white); }
+.field__input:focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; border-color: var(--pink); box-shadow: inset 0 0 0 1px var(--pink); }
+/* browser autofill keeps the page colours */
+.field__input:-webkit-autofill, .field__input:-webkit-autofill:focus { -webkit-text-fill-color: var(--white); box-shadow: inset 0 0 0 100px var(--purple); transition: background-color 9999s; }
+/* a tick once a typed field has been checked and is fine */
+.field.is-valid .field__input:not(.combo__input):not(.field__select) { padding-right: calc(var(--field-pad) + 28px);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M3.5 10.5l4.2 4.2 8.8-9.2' fill='none' stroke='%23f9cade' stroke-width='2'/%3E%3C/svg%3E") no-repeat right var(--field-pad) center / 18px 18px; }
+.field.is-invalid .field__input, .field.is-invalid .check__box { border-color: var(--error); box-shadow: inset 0 0 0 1px var(--error); }
+.field__error { display: flex; align-items: flex-start; gap: .45em; margin-top: .5em; font-size: var(--fs-hint); font-weight: 400; line-height: 1.3; color: var(--error); }
+.field__error::before { content: ""; flex: none; width: 1.15em; height: 1.15em; margin-top: .07em; background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 1a9 9 0 100 18 9 9 0 000-18zm-1 4.5h2v6.5H9zm1 8a1.3 1.3 0 110 2.6 1.3 1.3 0 010-2.6z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 1a9 9 0 100 18 9 9 0 000-18zm-1 4.5h2v6.5H9zm1 8a1.3 1.3 0 110 2.6 1.3 1.3 0 010-2.6z'/%3E%3C/svg%3E") center / contain no-repeat; }
+.field__suggest { margin-top: .5em; font-size: var(--fs-hint); font-weight: 400; line-height: 1.3; }
+.field__suggest button { color: var(--pink); text-decoration: underline; text-underline-offset: .18em; }
+
+/* the plain country list (no JS) and the searchable one built from it */
+.field__select { padding-right: calc(var(--field-pad) + 30px); cursor: pointer;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 9'%3E%3Cpath d='M1 1.5l6 6 6-6' fill='none' stroke='%23ffffff' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right var(--field-pad) center / 14px 9px; }
+.field__select option { color: var(--ink); background: var(--white); }
+.combo { position: relative; }
+.combo__input { padding-right: var(--field-h); text-overflow: ellipsis; }
+.combo__input--pick { cursor: pointer; caret-color: transparent; -webkit-user-select: none; user-select: none; }
+.field__select:required:invalid { color: rgba(255,255,255,.6); }   /* nothing chosen yet: reads as a placeholder */
+.combo__toggle { position: absolute; top: 0; right: 0; width: var(--field-h); height: var(--field-h); display: grid; place-items: center; color: var(--white); }
+.combo__toggle svg { width: 14px; height: 9px; transition: transform .3s var(--ease-out); }
+.combo.is-open .combo__toggle svg { transform: rotate(180deg); }
+.combo.is-open { z-index: 6; }
+/* the list is the menu's dropdown again: a pink panel, the item under the pointer or the arrow keys is blue */
+.combo__list { position: absolute; z-index: 10; left: 0; right: 0; top: calc(100% + 4px); margin: 0; padding: 6px; list-style: none;
+  max-height: min(310px, 44vh); overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  background: var(--pink); color: var(--purple); box-shadow: 0 18px 44px rgba(13,12,38,.35);
+  font-size: var(--fs-field); font-weight: 400; line-height: 1.2; }
+.combo__option { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding: .45em calc(var(--field-pad) - 6px); cursor: pointer; }
+.combo__option mark { background: none; color: inherit; font-weight: 700; }
+.combo__option[aria-selected="true"] { font-weight: 500; }
+.combo__option[aria-selected="true"]::after { content: ""; flex: none; width: 14px; height: 8px; margin-top: -4px; border: solid currentColor; border-width: 0 0 2px 2px; transform: rotate(-45deg); }
+.combo__option.is-active { background: var(--purple); color: var(--white); }
+.combo__sep { height: 1px; margin: 6px calc(var(--field-pad) - 6px); background: rgba(255,255,255,.7); }
+.combo__empty { padding: .7em calc(var(--field-pad) - 6px); font-size: var(--fs-hint); line-height: 1.35; }
+
+/* consent */
+.field--consent { margin-top: clamp(28px, calc(40 * var(--u)), 40px); }
+.check { position: relative; display: flex; align-items: flex-start; gap: .75em; font-size: clamp(15px, calc(20 * var(--u)), 20px); font-weight: 300; line-height: 1.35; cursor: pointer; }
+.check input { position: absolute; left: 0; top: 0; width: 26px; height: 26px; margin: 0; opacity: 0; cursor: pointer; }
+.check__box { flex: none; width: 26px; height: 26px; margin-top: -.04em; display: grid; place-items: center; border: 1px solid var(--white); transition: background-color .2s ease, border-color .2s ease; }
+.check__box::after { content: ""; width: 13px; height: 7px; margin-top: -3px; border: solid var(--purple); border-width: 0 0 2px 2px; transform: rotate(-45deg) scale(0); transition: transform .25s var(--ease-out); }
+.check input:checked + .check__box { background: var(--pink); border-color: var(--pink); }
+.check input:checked + .check__box::after { transform: rotate(-45deg) scale(1); }
+.check input:focus-visible + .check__box { outline: 2px solid var(--pink); outline-offset: 3px; }
+.check a { color: var(--pink); text-decoration: underline; text-underline-offset: .18em; white-space: nowrap; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+.form__submit { position: relative; display: flex; align-items: center; justify-content: center; gap: .8em;
+  width: 100%; min-height: var(--field-h); margin-top: clamp(28px, calc(40 * var(--u)), 40px); padding: 0 1.2em;
+  background: var(--pink); color: var(--purple); font-size: var(--fs-button); font-weight: 500; line-height: 1; transition: background-color .3s ease; }
+.form__submit:hover { background: var(--white); }
+.form__spinner { display: none; width: 1em; height: 1em; border: 2px solid rgba(54,51,140,.3); border-top-color: var(--purple); border-radius: 50%; animation: reg-spin .8s linear infinite; }
+.form__submit.is-busy { pointer-events: none; }
+.form__submit.is-busy .form__spinner { display: block; }
+@keyframes reg-spin { to { transform: rotate(360deg); } }
+
+.form__summary { margin-bottom: clamp(16px, calc(22 * var(--u)), 22px); font-size: var(--fs-hint); line-height: 1.4; }
+.form__summary-title { font-weight: 500; color: var(--error); }
+
+/* thank-you message (takes the place of the form) */
+.reg__done { margin-top: clamp(32px, calc(56 * var(--u)), 56px); outline: none; }
+.reg__done-title { font-size: var(--fs-display); font-weight: 500; line-height: 1.05; color: var(--pink); overflow-wrap: anywhere; }
+.reg__done-text { margin-top: clamp(14px, calc(26 * var(--u)), 26px); max-width: 30em; font-size: var(--fs-body); font-weight: 300; line-height: var(--lh-body); overflow-wrap: anywhere; }
+.reg__done-text b { font-weight: 500; }
+.reg__done-actions { margin-top: clamp(22px, calc(36 * var(--u)), 36px); font-size: var(--fs-body); }
+.reg__done-link { color: var(--pink); text-decoration: underline; text-underline-offset: .2em; text-decoration-thickness: 1px; }
+.reg__done-link:hover { color: var(--white); }
+.reg__done.is-in > * { animation: reg-rise .9s var(--ease-out) both; }
+.reg__done.is-in > :nth-child(2) { animation-delay: .1s; }
+.reg__done.is-in > :nth-child(3) { animation-delay: .2s; }
+@keyframes reg-rise { from { opacity: 0; transform: translateY(22px); } }
+
+@media (max-width: 767px) {
+  /* phones: one field to a row, full-width button */
+  .form__grid { grid-template-columns: 1fr; }
+  .form__grid > .field:nth-child(2) { margin-top: clamp(20px, calc(30 * var(--u)), 30px); }
+  .combo__list { max-height: min(264px, 38vh); }
+}
+
+/* ---------- Privacy policy page ----------
+   The registration page's column, with plain sections of text. Body copy is a step smaller than the site's 26 px: it is a long read. */
+.policy h2 { margin-top: clamp(32px, calc(52 * var(--u)), 52px); font-size: clamp(19px, calc(30 * var(--u)), 30px); font-weight: 500; line-height: 1.15; color: var(--white); }
+.policy h2 + .body { margin-top: clamp(8px, calc(14 * var(--u)), 14px); }
+.policy h2 ~ .body { font-size: clamp(16px, calc(23 * var(--u)), 23px); line-height: 1.35; }
+.policy .body p + p, .policy .body ul + p { margin-top: .9em; }
+.policy ul { margin: .5em 0 0; padding-left: 1.2em; }
+.policy li + li { margin-top: .3em; }
+.policy li::marker { color: var(--pink); }
+.policy .policy__date { margin-top: 2.2em; opacity: .75; }
