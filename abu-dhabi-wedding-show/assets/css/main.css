@@ -235,7 +235,18 @@ html:not(.js) .play:hover, html.reduced .play:hover { scale: 1.05; }
 .scroll-hint span { position: absolute; left: 0; top: 0; width: 100%; height: 45%; background: var(--pink); animation: hint 2s var(--ease-inout) infinite; }
 @keyframes hint { 0% { transform: translateY(-100%); } 65%, 100% { transform: translateY(230%); } }
 @media (max-width: 1023px) { .hero { height: clamp(480px, 72svh, 760px); } }
+/* Banner film (home): sits over the photo and fades in once it is playing. It fills the banner exactly (no parallax
+   travel, unlike the photo), so on desktop only about 6% of the 16:9 frame is lost top and bottom. */
+/* 1.2% overscan on every side: the film's end card has a thin black edge along its right and bottom */
+.hero__video { position: absolute; left: -1.2%; top: -1.2%; width: 102.4%; height: 102.4%; object-fit: cover; object-position: 50% 50%; z-index: -2; opacity: 0; transition: opacity 1s ease; pointer-events: none; }
+.hero__video.is-playing { opacity: 1; }
+/* the film runs from dark sea to a pale end card: a steadier shade behind the logo and menu */
+.hero--film::before { background: linear-gradient(180deg, rgba(10,9,35,.78) 0%, rgba(10,9,35,.6) 16%, rgba(10,9,35,.28) 32%, rgba(10,9,35,0) 50%), rgba(10,9,35,.06); }
 @media (max-width: 767px)  { .display .br, .kicker .br { display: inline; }   /* phones: no forced break. inline, not none: the line animation misreads a hidden element */ .display { text-wrap: balance; } .tier__logos { min-height: 120px; } .hero { height: clamp(520px, 82svh, 760px); } .hero > img { object-position: var(--hero-pos-m, 42% 40%); } }
+/* Tablet and phone: the film has titles and a logo across the middle 60% of its width, so a tall banner would cut them.
+   The banner takes a 4:3 shape there, which keeps the middle 75% of the frame. */
+@media (max-width: 1023px) { .hero.hero--film { height: auto; aspect-ratio: 4 / 3; }
+  .hero--film::before { background: linear-gradient(180deg, rgba(10,9,35,.8) 0%, rgba(10,9,35,.64) 24%, rgba(10,9,35,.22) 44%, rgba(10,9,35,0) 62%), rgba(10,9,35,.06); } }
 
 /* Video dialog */
 .video-dialog { border: 0; padding: 0; background: #000; width: min(92vw, 1600px); aspect-ratio: 16/9; }

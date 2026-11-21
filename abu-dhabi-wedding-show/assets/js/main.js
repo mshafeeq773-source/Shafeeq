@@ -126,6 +126,28 @@
     if (e.persisted && motion && veils) { gsap.set(veils, { yPercent: 0 }); curtainOpen(); if (lenis) lenis.start(); }
   });
 
+  /* ---------------------------------------------------------------- banner film (home)
+     Streamed from the address in data-src; nothing is loaded until here. Muted, looping, inline. It fades in over the
+     photo once it is really playing, pauses while the banner is off screen, and is skipped for reduced motion and
+     data-saver visitors (they keep the photo). If the address does not answer, the photo simply stays. */
+  (function heroFilm() {
+    var v = document.querySelector('.hero__video');
+    var src = v && v.getAttribute('data-src');
+    var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (!src || reduce || (conn && conn.saveData)) return;
+    var play = function () { var p = v.play(); if (p && p.catch) p.catch(function () {}); };
+    v.muted = true; v.defaultMuted = true;
+    v.addEventListener('playing', function () { v.classList.add('is-playing'); }, { once: true });
+    v.preload = 'auto';
+    v.src = src;
+    play();
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (e.isIntersecting) play(); else v.pause(); });
+      }, { threshold: 0.02 }).observe(v.parentNode);
+    }
+  })();
+
   /* ---------------------------------------------------------------- hero */
   function heroIntro() {
     var tl = gsap.timeline();
